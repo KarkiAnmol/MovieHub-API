@@ -33,3 +33,43 @@ func DeleteMovie(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
+func GetMovie(w http.ResponseWriter, r *http.Request) {
+	movieDetails := models.GetMovie()
+	res, _ := json.Marshal(movieDetails)
+	w.Header().Set("Content-Type", "pkglication/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
+func GetMovieById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	Id := vars["Id"]
+	ID, err := strconv.ParseInt(Id, 0, 0)
+	if err != nil {
+		fmt.Println("Error while parsing")
+	}
+	movieDetails, _ := models.GetMovieById(ID)
+	res, _ := json.Marshal(movieDetails)
+	w.Header().Set("Content-Type", "pkglication/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+
+}
+func UpdateMovie(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	Id := vars["ID"]
+	ID, err := strconv.ParseInt(Id, 0, 0)
+	if err != nil {
+		fmt.Println("Error while parsing")
+	}
+	updateMovie := &models.Movie{}
+	utils.ParseBody(r, updateMovie)
+	movieDetails, db := models.GetMovieById(ID)
+	if updateMovie.Name != "" {
+		movieDetails.Name = updateMovie.Name
+	}
+	db.Save(&movieDetails)
+	res, _ := json.Marshal(updateMovie)
+	w.Header().Set("Content-Type", "pkglication/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
